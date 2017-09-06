@@ -9,7 +9,46 @@
 # for further details about Dynatrace Managed installation params 
 # check out https://help.dynatrace.com/dynatrace-managed/dynatrace-server/can-i-install-dynatrace-server-using-custom-parameters/
 
+#the following block creates a security group allowing SSH and HTTPS inbound traffic to access the node (ssh) and the UI.
+#in the sample below the ingress blocks are allowed for ANY IP address. This is not the best practice when it comes to SSH, you
+#should only specify the IP address of your machine or the one of your jumpbox.
+resource "aws_security_group" "terraformsg" {
+  name        = "terraformsg"
+  description = "Allow SSH and HTTPS inbound traffic for Dynatrace Managed"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  ingress {
+    from_port = 8443
+    to_port = 8443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_instance" "dynatracemanagednode" {
+	
+	#specify the security group we've just created in the previous block, passing the id of the newly created terraformsg
+	vpc_security_group_ids = ["${aws_security_group.terraformsg.id}"]
 	
 	#enter the key pair name of the key pair you've previously created on AWS - the value is defined in the vars file 
 	key_name = "${var.AWS_KEYPAIR_NAME}"
@@ -46,8 +85,13 @@ resource "aws_instance" "dynatracemanagednode" {
 				type = "ssh"
 				user = "ubuntu"
 				private_key = "${file(var.AWS_PRIVATE_KEY)}"
-				timeout = "2m"
+				timeout = "3m"
 				agent = false
 			}
   	}
+}
+
+#a little trick to show the complete url with the public_dns of the created node. Simply copy and paste it in your browser and you're done.
+output "public_dns" {
+  value = "https://${aws_instance.dynatracemanagednode.public_dns}"
 }
