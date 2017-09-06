@@ -79,6 +79,11 @@ variable "AWS_PRIVATE_KEY"{
 default = "/path/to/file/MyAWSKeyName.pem"
 }
 
+#specify the root volume size. default is 20GB
+variable "ROOT_VOLUME_SIZE"{
+default = 20
+}
+
 #here are the Ubuntu AMI IDs already listed for each region 
 variable "AMIS"{
 # you can comment the following lines to be prompted for the aws-amis
