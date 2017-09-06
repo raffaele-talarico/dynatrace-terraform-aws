@@ -59,9 +59,8 @@ resource "aws_instance" "dynatracemanagednode" {
 	
 	#EC2 instance root volume size
 	root_block_device {
-	#choose the volume size you'd like to assign to the root volume
-        volume_size = 20
-    }
+        volume_size = "${var.ROOT_VOLUME_SIZE}"
+   	}
 
 	#specify a tag (optional) for the EC2 instance
 	tags {
