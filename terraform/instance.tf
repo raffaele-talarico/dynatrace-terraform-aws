@@ -91,6 +91,6 @@ resource "aws_instance" "dynatracemanagednode" {
 }
 
 #a little trick to show the complete url with the public_dns of the created node. Simply copy and paste it in your browser and you're done.
-output "public_dns" {
+output "connect_to_dynatrace" {
   value = "https://${aws_instance.dynatracemanagednode.public_dns}"
 }
